@@ -1,21 +1,39 @@
-# Post-summer Team Meeting (7 ppl, 60 min)
+# Presentations — Team meeting SPA
 
-A lightweight, in-person agenda and interactive page to run a 60-minute team kickoff after summer.
+Single-file meeting agenda & realtime mini-app for quick team sessions.
 
-What’s included
-- `post_summer_fun_team_meeting_7ppl_60min.html`: single-file HTML with styles and small JS to run a timed agenda, pick a challenge, and collect team "vibes".
+- Live demo: https://presentations-558b1.web.app
+- Firebase project: `presentations-558b1`
 
-Quick start
-1. Open the file in your browser (double-click or right-click → Open with → your browser).
-2. Click **Start** to run the 60-minute timer. Use the phase headers to expand/collapse sections.
-3. Interact with the challenge cards and vibe buttons during the meeting.
+Files included
 
-Notes
-- The file is self-contained; no server is required.
-- If you want this on GitHub Pages, you can push the file to a repository and enable Pages for the branch.
+- `post_summer_fun_team_meeting_7ppl_60min.html` — single-file SPA (agenda, timer, challenge cards, vibes) with Firebase Realtime Database sync and Google sign-in UI.
+- `database.rules.json` — Realtime Database rules (reads open, writes require authentication for `vibes` and `challenge`).
 
-Contact
-- File edited and maintained by the repository owner.
+Quick notes
 
-License
-- Use freely within your organization. No license file included — add one if you need a specific open-source license.
+- The app uses Firebase compat SDKs (v9.22.0) and signs users in anonymously by default. Google Sign-In button is available for authenticated actions.
+- To allow users to sign in with Google, enable the Google provider in Firebase Console → Build → Authentication → Sign-in method.
+- Admin controls: the UI checks for the admin email `barzegar.sima.barzegar@gmail.com` and for UIDs listed under `/admins`. You can add admin UIDs to `/admins/<uid> = true` via the Firebase Console or REST/CLI.
+
+Deploying
+
+1. Install `firebase-tools` and login:
+
+```bash
+npm install -g firebase-tools
+firebase login
+```
+
+2. Deploy hosting and database rules (from this repo root):
+
+```bash
+firebase deploy --only hosting,database --project presentations-558b1
+```
+
+Security
+
+- Current DB rules allow authenticated users to write `vibes` and `challenge`.
+- If you want only admins to write, revert `database.rules.json` to restrict writes to `root.child('admins').child(auth.uid).val() === true` (or to specific email checks) and redeploy rules.
+
+If you want, I can also create a small GitHub Actions workflow to deploy the site automatically on push.
