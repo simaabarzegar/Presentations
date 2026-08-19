@@ -1,59 +1,37 @@
-# Presentations — Team meeting SPA
+# Post-summer Team Meeting (7 ppl, 60 min)
 
-Single-file meeting agenda & realtime mini-app for quick team sessions.
+A lightweight, in-person agenda and interactive page to run a 60-minute team kickoff after summer.
 
-- Live demo: https://presentations-558b1.web.app
-- Firebase project: `presentations-558b1`
+What’s included
+- `post_summer_fun_team_meeting_7ppl_60min.html`: single-file HTML with styles and small JS to run a timed agenda, pick a challenge, and collect team "vibes".
 
-Files included
+Quick start
+1. Open the file in your browser (double-click or right-click → Open with → your browser).
+2. Click **Start** to run the 60-minute timer. Use the phase headers to expand/collapse sections.
+3. Interact with the challenge cards and vibe buttons during the meeting.
 
-- `post_summer_fun_team_meeting_7ppl_60min.html` — single-file SPA (agenda, timer, challenge cards, vibes) with Firebase Realtime Database sync and Google sign-in UI.
-- `database.rules.json` — Realtime Database rules (reads open, writes require authentication for `vibes` and `challenge`).
+Notes
+- The file is self-contained; no server is required.
+- If you want this on GitHub Pages, you can push the file to a repository and enable Pages for the branch.
 
-Quick notes
+Auto-deploy (secure)
 
-- The app uses Firebase compat SDKs (v9.22.0) and signs users in anonymously by default. Google Sign-In button is available for authenticated actions.
-- To allow users to sign in with Google, enable the Google provider in Firebase Console → Build → Authentication → Sign-in method.
-- Admin controls: the UI checks for the admin email `barzegar.sima.barzegar@gmail.com` and for UIDs listed under `/admins`. You can add admin UIDs to `/admins/<uid> = true` via the Firebase Console or REST/CLI.
+This repository includes a GitHub Actions workflow that deploys the Firebase Hosting site on push to `main`. For secure CI deploys we prefer a service-account JSON secret instead of a long-lived CLI token.
 
-Deploying
+Create and add the secret:
 
-1. Install `firebase-tools` and login:
+1. In the Firebase Console → Project Settings → Service accounts, create a new service account or use the existing one. Grant it the **Editor** role for the project (or narrower roles if you prefer).
+2. Generate a new private key (JSON) and save the JSON content.
+3. In GitHub, go to your repository → Settings → Secrets & variables → Actions → New repository secret.
+   - Name: `FIREBASE_SERVICE_ACCOUNT`
+   - Value: paste the full JSON content and save.
 
-```bash
-npm install -g firebase-tools
-firebase login
-```
+The workflow writes the secret to `firebase-service-account.json` during the run and sets `GOOGLE_APPLICATION_CREDENTIALS` so the Firebase CLI can authenticate using the service account.
 
-2. Deploy hosting and database rules (from this repo root):
+If you prefer using `firebase login:ci` tokens instead, the older workflow still works with a secret named `FIREBASE_TOKEN`.
 
-```bash
-firebase deploy --only hosting,database --project presentations-558b1
-```
+Contact
+- File edited and maintained by the repository owner.
 
-CI / Auto-deploy with GitHub Actions
-
-This repository includes a GitHub Actions workflow at `.github/workflows/firebase-deploy.yml` that deploys `hosting` on every push to `main`.
-
-Before the workflow can deploy, add a repository secret named `FIREBASE_TOKEN` containing a CI token generated from the Firebase CLI:
-
-```bash
-# on your machine, authenticated with the same Firebase account
-firebase login:ci
-# copy the token printed by the command and add it as the repo secret
-```
-
-To add the secret:
-
-1. Go to your GitHub repository → Settings → Secrets & variables → Actions → New repository secret
-2. Name: `FIREBASE_TOKEN`
-3. Value: paste the token from `firebase login:ci` and save
-
-After that, pushes to `main` will automatically deploy the `presentations-558b1` hosting site.
-
-Security
-
-- Current DB rules allow authenticated users to write `vibes` and `challenge`.
-- If you want only admins to write, revert `database.rules.json` to restrict writes to `root.child('admins').child(auth.uid).val() === true` (or to specific email checks) and redeploy rules.
-
-If you want, I can also configure the workflow to use a service-account `FIREBASE_SERVICE_ACCOUNT` JSON secret instead (recommended for multi-user CI). Just say which you prefer and I will update the workflow and README accordingly.
+License
+- Use freely within your organization. No license file included — add one if you need a specific open-source license.
